@@ -7,7 +7,7 @@ class UserCreate(BaseModel):
     full_name: str
     email: EmailStr
     password: str
-    role: str  # Should be one of: "student", "tutor", "parent", "admin"
+    role: str  # Should be "student" or "lecturer"
 
 class UserResponse(BaseModel):
     id: UUID
@@ -25,10 +25,4 @@ class UserResponse(BaseModel):
             created_at=user.created_at.isoformat()  # Convert datetime to string
         )
     
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
 
-    class Config:
-        from_attributes = True
-        

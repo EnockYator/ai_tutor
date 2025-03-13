@@ -10,23 +10,23 @@ from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def register_user(user_data: UserCreate, db: Session):
+def add_user(user_data: UserCreate, db: Session):
     """Creates a new user with a hashed password."""
-    user = User(
+    new_user = User(
         id=uuid4(),
         full_name=user_data.full_name,
         email=user_data.email,
         password_hash=hash_password(user_data.password),
         role=user_data.role
     )
-    db.add(user)
+    db.add(new_user)
     db.commit()
-    db.refresh(user)
-    return user
+    db.refresh(new_user)
+    return new_user
 
-def get_user_by_email(email: str, db: Session):
+def get_user_by_email(db: Session, user_email: str):
     """Fetch a user by email."""
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(User).filter(User.email == user_email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user

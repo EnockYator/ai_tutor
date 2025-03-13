@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from services.user_service import register_user, get_user_by_id, get_user_by_email
-from schemas.user_schema import UserCreate, UserResponse, UserLogin
+from services.user_service import add_user, get_user_by_id, get_user_by_email
+from schemas.user_schema import UserCreate, UserResponse
+from models import User
 from database import get_db, SessionLocal
 
 # Dependency to get a database session
@@ -16,12 +17,15 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 
+
 def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
-    """Register a new user."""
-    existing_user = get_user_by_email(db, user_data.email)
+    """Add a new user."""
+    existing_user = db.query(User).filter(User.email == user_data.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    return register_user(user_data, db)
+    # Call the actual service function
+    return add_user(user_data, db)
+
 
 @router.get("/{user_id}", response_model=UserResponse)
 def fetch_user_by_id(user_id: str, db: Session = Depends(get_db)):
@@ -30,6 +34,7 @@ def fetch_user_by_id(user_id: str, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
 
 @router.get("/", response_model=UserResponse)
 def fetch_user_by_email(user_email: str, db: Session = Depends(get_db)):
