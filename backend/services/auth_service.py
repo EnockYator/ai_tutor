@@ -1,24 +1,54 @@
+from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
+from jose import jwt, JWTError
+from fastapi import HTTPException
+from models.user_model import User
+from schemas.auth_schema import RegisterSchema
+from security import hash_password
+from uuid import uuid4
+from pydantic import EmailStr
+import os
 
-SECRET_KEY = "jsjsaASHhisSHWDUDHHIGihIIJHUAHFAIHKYGUDAAGUFAUAGFAU"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
+def get_user_in_db(db: Session, user_email: EmailStr):
+    user = db.query(User).filter(User.email == user_email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User does not exist")
+    return user
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+def authenticate_user(db: Session, email: EmailStr, password: str):
+    user = get_user_in_db(db, email)
+    if not user or not verify_password(password, user.password_hash):
+        return None
+    return user
+
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def register_user(user_data: RegisterSchema, db: Session):
+    """Register a new user."""
+    new_user = User(
+        id=uuid4(),
+        full_name=user_data.full_name,
+        email=user_data.email,
+        password_hash=hash_password(user_data.password),
+        role=user_data.role
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+

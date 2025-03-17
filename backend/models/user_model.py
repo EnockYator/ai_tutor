@@ -11,6 +11,6 @@ class User(Base):
     full_name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
-    role = Column(Enum("student", "lecturer", name="user_roles"), nullable=False)
+    role = Column(Enum("student", "tutor", name="user_roles"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)

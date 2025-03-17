@@ -7,7 +7,7 @@ class UserCreate(BaseModel):
     full_name: str
     email: EmailStr
     password: str
-    role: str  # Should be "student" or "lecturer"
+    role: str  # Should be "student" or "tutor"
 
 class UserResponse(BaseModel):
     id: UUID
