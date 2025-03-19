@@ -14,8 +14,10 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
+# Password hash context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# Find provided email in database
 def get_user_in_db(db: Session, user_email: EmailStr):
     user = db.query(User).filter(User.email == user_email).first()
     if not user:
@@ -25,12 +27,15 @@ def get_user_in_db(db: Session, user_email: EmailStr):
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+# Authenticate the user
 def authenticate_user(db: Session, email: EmailStr, password: str):
     user = get_user_in_db(db, email)
-    if not user or not verify_password(password, user.password_hash):
+    if not user or not verify_password(password, user.password_hash): 
+        raise HTTPException(status_code=404, detail="User does not exist")
         return None
     return user
 
+# Create token
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))

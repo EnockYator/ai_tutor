@@ -33,10 +33,16 @@ def register(user_data: RegisterSchema, db: Session = Depends(get_db)):
 
 @router.post("/login/", response_model=TokenData)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    email = form_data.username
+    password = form_data.password
     
-    print(form_data.username)  # Debug to check input data
-    print(form_data.password)
-    user = authenticate_user(db, form_data.username, form_data.password)
+    # Debugging
+    print(f"Received email: {email}, password: {password}")
+    
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email not found")
+    
+    user = authenticate_user(db, email, password)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     access_token = create_access_token(data={"sub": user.email})
