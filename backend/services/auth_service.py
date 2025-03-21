@@ -3,7 +3,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
 from fastapi import HTTPException
-from models.user_model import User
+from models import User
 from schemas.auth_schema import RegisterSchema
 from security import hash_password
 from uuid import uuid4

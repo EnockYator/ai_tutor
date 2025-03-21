@@ -6,6 +6,7 @@ from database import Base # Import Base from database.py
 
 class Course(Base):
     __tablename__ = "courses"
+    __table_args__ = {"info": {"skip_autogenerate": True}}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     course_title = Column(String, nullable=False)

@@ -6,6 +6,8 @@ from database import Base # Import Base from database.py
 
 class StudentAnswer(Base):
     __tablename__ = 'student_answers'
+    __table_args__ = {"info": {"skip_autogenerate": True}}
+    
     id = Column(UUID, primary_key=True, default=uuid4)
     student_id = Column(UUID, ForeignKey('users.id'))
     question_id = Column(UUID, ForeignKey('questions.id'))

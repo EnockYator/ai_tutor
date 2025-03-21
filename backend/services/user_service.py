@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models.user_model import User
+from models import User
 from schemas.user_schema import UserCreate
 import uuid
 from uuid import uuid4
