@@ -75,7 +75,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
     """
     connectable = create_engine(
-        database_url,
+        SQLALCHEMY_DATABASE_URL,
         poolclass=pool.NullPool,  # Disable connection pooling for migrations
     )
 

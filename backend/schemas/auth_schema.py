@@ -3,6 +3,8 @@ from uuid import UUID
 from datetime import datetime
 
 class TokenData(BaseModel):
+    access_token: str
+    token_type: str
     email: EmailStr | None = None
 
 class UserResponse(BaseModel):
