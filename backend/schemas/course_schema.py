@@ -8,6 +8,9 @@ class CourseCreate(BaseModel):
     course_code: str
     course_tutor: str
     course_notes: List[str]
+    
+    class Config:
+        from_attributes = True
 
 class CourseResponse(BaseModel):
     id: UUID
@@ -15,6 +18,9 @@ class CourseResponse(BaseModel):
     course_code: str
     course_tutor: str
     created_at: datetime
+    
+    class Config:
+        from_attributes = True
     
     @classmethod
     def from_orm(cls, course):

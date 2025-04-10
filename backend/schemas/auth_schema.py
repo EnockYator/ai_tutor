@@ -2,17 +2,15 @@ from pydantic import BaseModel, EmailStr
 from uuid import UUID
 from datetime import datetime
 
-class TokenData(BaseModel):
-    access_token: str
-    token_type: str
-    email: EmailStr | None = None
-
 class UserResponse(BaseModel):
     id: UUID
     full_name: str
     email: EmailStr
     role: str
     created_at: datetime
+    
+    class Config:
+        from_attributes = True
     
     @classmethod
     def from_orm(cls, user):
@@ -22,10 +20,30 @@ class UserResponse(BaseModel):
             email=user.email,
             created_at=user.created_at.isoformat()  # Convert datetime to string
         )
+        
+
+class UserLoginResponse(BaseModel):
+    email: EmailStr
+    role: str
+    full_name: str
     
+    class Config:
+        from_attributes = True
+    
+class TokenData(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserLoginResponse
+    
+    class Config:
+        from_attributes = True
+
 class LoginSchema(BaseModel):
     email: EmailStr
     password: str
+    
+    class Config:
+        from_attributes = True
     
 
 class RegisterSchema(BaseModel):
@@ -34,14 +52,17 @@ class RegisterSchema(BaseModel):
     password: str
     role: str  # Should be "student" or "tutor"
     
+    class Config:
+        from_attributes = True
+    
     
 class LogoutSchema(BaseModel):
     id: UUID
     full_name: str
     email: EmailStr
     role: str
-
+    
     class Config:
-        orm_mode = True
+        from_attributes = True
         
 

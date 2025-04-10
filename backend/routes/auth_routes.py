@@ -4,21 +4,33 @@ from sqlalchemy.orm import Session
 from models import User
 from database import get_db, SessionLocal
 from security import verify_password
-from schemas.auth_schema import TokenData, LoginSchema, RegisterSchema, LogoutSchema, UserResponse
-from services.auth_service import authenticate_user, register_user, create_access_token
+from schemas.auth_schema import TokenData, UserLoginResponse, RegisterSchema, LogoutSchema, UserResponse
+from services.auth_service import authenticate_user, register_user, create_access_token, get_current_user
 
 
 # Dependency to get a database session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# def get_db():
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+# Role-based access control decorator
+def role_required(required_role: str):
+    def decorator(user: User = Depends(get_current_user)):
+        if user.role != required_role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this resource"
+            )
+        return user
+    return decorator
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -33,25 +45,28 @@ def register(user_data: RegisterSchema, db: Session = Depends(get_db)):
 
 @router.post("/login/", response_model=TokenData)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    email = form_data.username
-    password = form_data.password
-    
-    # Debugging
-    print(f"Received email: {email}, password: {password}")
-    
-    if not email or not password:
-        raise HTTPException(status_code=400, detail="Email not found")
-    
-    user = authenticate_user(db, email, password)
+    user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     
-    access_token = create_access_token(data={"sub": user.email})
+    access_token = create_access_token(data={"sub": user.email, "role": user.role})
     return {
         "access_token": access_token, 
         "token_type": "bearer",
-        "email": user.email # include email in response
+        "user": UserLoginResponse(
+            email=user.email,
+            role=user.role,
+            full_name=user.full_name
+        )
         }
 
+@router.post("/logout")
+async def logout():
+    # FastAPI doesn't handle sessions by default, so logout is client-side
+    return {"message": "Successfully logged out"}
 
 
