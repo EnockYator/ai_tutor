@@ -4,24 +4,24 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   HomeIcon,
-  ClipboardCheckIcon,
-  UserCircle2,
-  BellIcon,
-  CalendarIcon,
-  HistoryIcon,
-  ShieldCheck,
-  ChartNoAxesCombined,
-  MessageSquareIcon,
+  // ClipboardCheckIcon,
+  // UserCircle2,
+  // BellIcon,
+  // CalendarIcon,
+  // HistoryIcon,
+  // ShieldCheck,
+  // ChartNoAxesCombined,
+  // MessageSquareIcon,
   MenuIcon,
-  SettingsIcon,
-  DollarSign,
-  MessageCircle,
-  CircleHelp,
-  Headset,
-  ContactRound,
-  Palette,
-  Files,
-  Hospital,
+  // SettingsIcon,
+  // DollarSign,
+  // MessageCircle,
+  // CircleHelp,
+  // Headset,
+  // ContactRound,
+  // Palette,
+  // Files,
+  // Hospital,
 } from 'lucide-react';
 
 const Sidebar = ({ closeMenu }) => {
@@ -35,7 +35,7 @@ const Sidebar = ({ closeMenu }) => {
     >
       {/* Header */}
       <div className="flex justify-between items-center px-4 py-[18px] text-xl font-bold bg-blue-800 text-white border-b">
-        {!isCollapsed && <div>DoctorsNote</div>}
+        {!isCollapsed && <div>AI Tutor</div>}
         <MenuIcon
           className="w-6 h-6 cursor-pointer text-white"
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -51,7 +51,7 @@ const Sidebar = ({ closeMenu }) => {
           isCollapsed={isCollapsed}
           closeMenu={closeMenu}
         />
-        <NavItem
+        {/* <NavItem
           to="/doctor/profile"
           icon={UserCircle2}
           label="Profile"
@@ -168,7 +168,7 @@ const Sidebar = ({ closeMenu }) => {
           label="Settings"
           isCollapsed={isCollapsed}
           closeMenu={closeMenu}
-        />
+        /> */}
       </nav>
     </div>
   );

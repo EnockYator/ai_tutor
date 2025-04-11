@@ -22,11 +22,18 @@ export const loginFormControls =[
 
 export const registerFormControls =[
     {
-        name : 'userName',
+        name : 'fullName',
         label : 'Full Name',
         placeholder : 'Enter your name',
         componentType : 'input',
         type : 'text',
+    },
+    {
+        name : 'role',
+        label : 'Role',
+        options: ['student', 'tutor'],
+        placeholder: 'Student',
+        componentType : 'radio',
     },
     {
         name : 'email',
@@ -42,4 +49,5 @@ export const registerFormControls =[
         componentType : 'input',
         type : 'password',
     },
+    
 ];

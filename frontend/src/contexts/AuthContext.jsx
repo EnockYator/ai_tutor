@@ -20,10 +20,9 @@ export const AuthProvider = ({ children }) => {
     // Extract specific values for convenience
     const isAuthenticated = authState.isAuthenticated;
     const user = authState.user || null; 
-
-    // console.log("user: " + user)
-    // console.log("user Name: " + userName)
-    // console.log("isAuthenticated: " + isAuthenticated)
+    
+     // console.log("user: " , user)
+     // console.log("isAuthenticated: " + isAuthenticated)
 
     // Define actions
     const actions = {

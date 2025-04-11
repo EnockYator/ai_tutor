@@ -5,6 +5,10 @@ import AuthLayout from './components/auth/layout'
 import NotFound from './pages/not-found'
 import Docs from './pages/docs'
 
+// Visitor
+import IndexPage from './pages/visitor-view/Index'
+import VisitorLayout from './components/visitor-view/layout'
+
 // tutor
 import TutorDashboard from './pages/tutor-view/Dashboard'
 import TutorLayout from './components/tutor-view/layout'
@@ -52,8 +56,14 @@ function App() {
       <div className="flex flex-col overflow-hidden bg-white">
       <Toaster />
       <Routes>
-        {/* docs */}
+        {/* visitor route */}
+        <Route path='/' element={
+        <CheckAuth isAuthenticated={isAuthenticated} user={user}><VisitorLayout /></CheckAuth>
+      }>
+        <Route path='/' element={<IndexPage />}></Route>
         <Route path='/docs' element={<Docs />}></Route>
+      </Route>
+        
         
       {/* auth route */}
       <Route path='/auth' element={

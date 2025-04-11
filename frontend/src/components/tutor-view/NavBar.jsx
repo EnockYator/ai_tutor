@@ -1,8 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { BellIcon, MenuIcon, SearchIcon, UserCircle2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 function Navbar({ onClickMenuIcon, isDisplayingMenu }) {
+
+  const {user} = useAuth();
   return (
     <div className="sticky top-0 z-10 bg-blue-800 md:bg-white shadow px-3 md:px-6 pb-3 pt-2 md:py-4 space-y-2">
       <div className="flex items-center justify-between">
@@ -13,7 +16,7 @@ function Navbar({ onClickMenuIcon, isDisplayingMenu }) {
         />
         {/* Welcome Text */}
         <h1 className="absolute md:relative left-12 md:left-0 text-sm md:text-lg font-semibold text-gray-100 md:text-blue-800 whitespace-nowrap">
-          Hi, Doctor!
+          Hi, {user.full_name}!
         </h1>
         {/* Search Bar */}
         <div className="hidden md:flex mx-auto items-center flex-grow max-w-md space-x-2 px-3 py-1 border rounded-2xl">

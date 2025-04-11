@@ -3,9 +3,9 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   HomeIcon,
-  ClipboardCheckIcon,
+  // ClipboardCheckIcon,
   UserCircle2,
-  HistoryIcon,
+  // HistoryIcon,
   MenuIcon,
   // Headset,
   // SettingsIcon,
@@ -29,7 +29,7 @@ const Sidebar = ({ closeMenu }) => {
     >
       {/* Header */}
       <div className="flex justify-between items-center px-4 py-[18px] text-xl font-bold bg-blue-800 text-white border-b">
-        {!isCollapsed && <div>DoctorsNote</div>}
+        {!isCollapsed && <div>AI Tutor</div>}
         <MenuIcon
           className="w-6 h-6 cursor-pointer text-white"
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -52,20 +52,20 @@ const Sidebar = ({ closeMenu }) => {
           isCollapsed={isCollapsed}
           closeMenu={closeMenu}
         />
-        <NavItem
+        {/* <NavItem
           to="requests"
           icon={ClipboardCheckIcon}
           label="Request Note"
           isCollapsed={isCollapsed}
           closeMenu={closeMenu}
-        />
-        <NavItem
+        /> */}
+        {/* <NavItem
           to="history"
           icon={HistoryIcon}
           label="Notes History"
           isCollapsed={isCollapsed}
           closeMenu={closeMenu}
-        />
+        /> */}
         {/* <NavItem
           to="transaction"
           icon={DollarSign}

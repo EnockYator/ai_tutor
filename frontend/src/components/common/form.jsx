@@ -76,7 +76,7 @@ function renderInputsByComponentType(controlItem, formData, setFormData) {
   
       case "radio":
         return (
-          <div className="flex flex-col gap-2">
+          <div className="flex gap-3">
             {controlItem.options?.map((option) => (
               <label key={option.id} className="flex items-center space-x-2">
                 <input

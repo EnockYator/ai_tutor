@@ -70,7 +70,7 @@ function Navbar({ onClickMenuIcon, isDisplayingMenu }) {
         />
         {/* Welcome Text */}
         <h1 className="absolute md:relative left-12 md:left-0 text-sm md:text-lg font-semibold text-gray-100 md:text-blue-800 whitespace-nowrap">
-          Hello {user.userName}
+          Hi, {user.full_name}!
         </h1>
         {/* Search Bar */}
         <div className="hidden md:flex mx-auto items-center flex-grow max-w-md space-x-2 px-3 py-1 border rounded-2xl">
@@ -98,7 +98,6 @@ function Navbar({ onClickMenuIcon, isDisplayingMenu }) {
                 </div>
                 <div className="flex flex-col space-y-3 px-3">
                   <Link to="./profile" className="border-b">Update your profile</Link>
-                  <Link to="./settings" className="border-b">Your note request has been recieved succesfully</Link>
                 </div>
                 <div>
                   <h2 className="text-blue-600 font-semibold border-b border-blue-400"><Link to="notifications">View all</Link></h2>
