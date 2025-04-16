@@ -49,7 +49,7 @@ function AuthLogin() {
             
             toast({
                 title: "Success",
-                description: "Logged in successfully",
+                description: "Login successful",
                 className: "bg-toastSuccess text-white max-w-md h-16 z-50",
                 duration: 3000,
             });

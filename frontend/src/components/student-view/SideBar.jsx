@@ -46,6 +46,27 @@ const Sidebar = ({ closeMenu }) => {
           closeMenu={closeMenu}
         />
         <NavItem
+          to="courses"
+          icon={UserCircle2}
+          label="Courses"
+          isCollapsed={isCollapsed}
+          closeMenu={closeMenu}
+        />
+        <NavItem
+          to="assessment"
+          icon={UserCircle2}
+          label="assessment"
+          isCollapsed={isCollapsed}
+          closeMenu={closeMenu}
+        />
+        <NavItem
+          to="quiz"
+          icon={UserCircle2}
+          label="AI Practice Quiz"
+          isCollapsed={isCollapsed}
+          closeMenu={closeMenu}
+        />
+        <NavItem
           to="profile"
           icon={UserCircle2}
           label="Profile"

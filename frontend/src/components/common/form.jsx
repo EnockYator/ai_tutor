@@ -78,9 +78,10 @@ function renderInputsByComponentType(controlItem, formData, setFormData) {
         return (
           <div className="flex gap-3">
             {controlItem.options?.map((option) => (
-              <label key={option.id} className="flex items-center space-x-2">
-                <input
+              <div key={option.id} className="flex items-center space-x-2">
+                  <input
                   type="radio"
+                  id={`${controlItem.name}-${option.id}`}
                   name={controlItem.name}
                   value={option.id}
                   checked={value === option.id}
@@ -90,10 +91,15 @@ function renderInputsByComponentType(controlItem, formData, setFormData) {
                       [controlItem.name]: e.target.value,
                     })
                   }
-                  className="form-radio"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                 />
-                <span>{option.label}</span>
-              </label>
+                  <label 
+                    htmlFor={`${controlItem.name}-${option.id}`}
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    {option.label}
+                  </label>
+              </div>
             ))}
           </div>
         );

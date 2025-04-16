@@ -7,9 +7,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const initialState = {
-  userName: '',
+  full_name: '',
   email: '',
   password: '',
+  role: 'student', // default value
 };
 
 function AuthRegister() {
@@ -31,6 +32,9 @@ function AuthRegister() {
     if (data.password.length < 8) {
       return "Password must be at least 8 characters.";
     }
+    if (!['student', 'tutor'].includes(data.role)) {
+      return "Please select a valid role.";
+    }
     return null;
   }
 
@@ -51,12 +55,7 @@ function AuthRegister() {
 
     try {
       setIsLoading(true); // Set loading to true when submitting
-
-      // Add the `role` field to the formData
-      const customerFormData = { ...formData, role: "customer" };
-      console.log(customerFormData);
-
-      const result = await dispatch(register(customerFormData)).unwrap();
+      const result = await dispatch(register(formData)).unwrap();
       toast({
         title: "Success",
         description: result.message || "Registration successful!", // Message from backend registerCustomer endpoint

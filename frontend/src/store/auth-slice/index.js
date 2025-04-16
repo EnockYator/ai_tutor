@@ -14,9 +14,12 @@ const initialState = {
 // Register users
 export const register = createAsyncThunk(
     'auth/register',
-    async (userFormData, thunkAPI) => {
+    async (formData, thunkAPI) => {
       try {
-        const response = await axiosInstance.post('/auth/register', userFormData);
+        const response = await axiosInstance.post(
+          '/auth/register',
+          formData
+        );
         return response.data; // The message will be in response.data.message
       } catch (error) {
         const errorMessage =

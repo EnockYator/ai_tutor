@@ -12,12 +12,16 @@ import VisitorLayout from './components/visitor-view/layout'
 // tutor
 import TutorDashboard from './pages/tutor-view/Dashboard'
 import TutorLayout from './components/tutor-view/layout'
-import TutorProfile from './pages/tutor-view/Profile'
+import TutorCourses from './pages/tutor-view/courses'
+import TutorAssessment from './pages/tutor-view/assessment'
 
 // student
 import StudentLayout from './components/student-view/Layout'
 import StudentDashboard from './pages/student-view/dashboard'
 import StudentProfile from "./pages/student-view/profile";
+import Courses from './pages/student-view/courses'
+import Quiz from './pages/student-view/quiz'
+import Assessment from './pages/student-view/assessment'
 
 
 // utils
@@ -80,7 +84,8 @@ function App() {
         <CheckAuth isAuthenticated={isAuthenticated} user={user}><TutorLayout /></CheckAuth>
       }>
         <Route path='dashboard' element={<TutorDashboard />}></Route>
-        <Route path='profile' element={<TutorProfile />}></Route>
+        <Route path="courses" element={<TutorCourses />} />
+        <Route path="assessment" element={<TutorAssessment />} />
       </Route>
 
       {/* student route */}
@@ -88,6 +93,9 @@ function App() {
         <CheckAuth isAuthenticated={isAuthenticated} user={user}><StudentLayout /></CheckAuth>
       }>
         <Route path="dashboard" element={<StudentDashboard />} />
+        <Route path="courses" element={<Courses />} />
+        <Route path="assessment" element={<Assessment />} />
+        <Route path="quiz" element={<Quiz />} />
         <Route path="profile" element={<StudentProfile />} />
       </Route>
       <Route path='*' element={<NotFound />}></Route>
