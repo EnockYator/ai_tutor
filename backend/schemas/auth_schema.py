@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
 from datetime import datetime
 
@@ -47,10 +47,10 @@ class LoginSchema(BaseModel):
     
 
 class RegisterSchema(BaseModel):
-    full_name: str
+    full_name: str = Field(..., min_length=2, description="Full name must be at least 2 characters")
     email: EmailStr
-    password: str
-    role: str  # Should be "student" or "tutor"
+    password: str = Field(..., min_length=8, description="Password must be at least 8 characters")
+    role: str = Field(..., pattern="^(student|tutor)$", description="Role must be either 'student' or 'tutor'")
     
     class Config:
         from_attributes = True
