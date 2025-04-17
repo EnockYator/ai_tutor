@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -5,25 +6,25 @@ import { useState } from 'react';
 const assessmentsData = [
   {
     id: '550e8400-e29b-41d4-a716-446655440000',
-    title: 'Midterm Examination',
-    course: 'Advanced Calculus',
+    title: 'Simulation & Modeling',
+    code: 'COM 410',
     due_date: '2023-11-15T14:00:00Z',
     duration: '2 hours',
     status: 'upcoming', // upcoming, completed, missed
     total_questions: 25,
     average_score: 72, // null if not completed
-    instructions: 'Bring calculator and formula sheet'
+    instructions: 'Answer all questions'
   },
   {
     id: '3f9a5f8c-2e44-4bb3-b38d-05b5a0a15a1d',
-    title: 'Chapter 3 CAT',
-    course: 'Quantum Physics',
+    title: 'Artificial Intelligence',
+    code: 'COM 420',
     due_date: '2023-10-25T10:30:00Z',
     duration: '45 minutes',
     status: 'completed',
     total_questions: 15,
     average_score: 85,
-    instructions: 'Closed book assessment'
+    instructions: 'Answer all questions'
   }
 ];
 
@@ -34,7 +35,7 @@ export default function Assessment() {
   const filteredAssessments = assessmentsData.filter(assessment => {
     const matchesSearch = 
       assessment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      assessment.course.toLowerCase().includes(searchTerm.toLowerCase());
+      assessment.code.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesFilter = 
       filter === 'all' || assessment.status === filter;
@@ -121,12 +122,12 @@ function AssessmentCard({ assessment }) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-md transition-all border border-gray-100">
       {/* Assessment Header */}
-      <div className="flex justify-between items-start p-4 border-b">
+      <div className="bg-gradient-to-r from-blue-800 to-blue-950 flex justify-between items-start p-4 border-b text-white">
         <div>
           <h2 className="font-bold text-lg">{assessment.title}</h2>
-          <p className="text-gray-600">{assessment.course}</p>
+          <p className="text-blue-100">{assessment.code}</p>
         </div>
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[assessment.status]}`}>
           {assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1)}
@@ -195,7 +196,7 @@ function AssessmentCard({ assessment }) {
         <div className="flex gap-2">
           {assessment.status === 'upcoming' && (
             <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
-              Prepare Now
+              Take Assessment
             </button>
           )}
           <Link
