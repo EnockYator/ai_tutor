@@ -8,6 +8,9 @@ import { LoadingProvider } from './contexts/LoadingContext'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import { AuthProvider } from './contexts/AuthContext'
 import { SkeletonProvider } from './contexts/SkeletonContext'
+import { CourseProvider } from './contexts/CourseContext'
+import { CatProvider } from './contexts/CatContext'
+import { QuizProvider } from './contexts/QuizContext'
 //import { AppLoadingProvider } from './contexts/AppLoadingContext'
 
 
@@ -17,10 +20,15 @@ createRoot(document.getElementById('root')).render(
       <Provider store={store}>
         <LoadingProvider>
           <AuthProvider>
-              <SkeletonProvider>
-              <App />
-              </SkeletonProvider>
-            
+            <CourseProvider>
+              <CatProvider>
+                <QuizProvider>
+                  <SkeletonProvider>
+                    <App />
+                  </SkeletonProvider>
+                </QuizProvider>
+              </CatProvider>
+            </CourseProvider>
           </AuthProvider>
         </LoadingProvider>
       </Provider>

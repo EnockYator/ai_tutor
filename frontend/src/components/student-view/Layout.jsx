@@ -11,7 +11,7 @@ function StudentLayout() {
   const closeMenu = () => setIsDisplayingMenu(false);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-screen bg-gray-300">
       {/* Sidebar for small screens */}
       {isDisplayingMenu && (
         <div className="fixed inset-0 z-40 md:hidden flex">
