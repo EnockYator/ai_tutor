@@ -7,3 +7,5 @@ from .question_model import Question
 from .student_answer_model import StudentAnswer
 from .ai_feedback_model import AIFeedback
 from .ai_practice_quiz_models import AIPracticeQuiz
+from .enrollment_models import Enrollments
+from .course_notes_models import CourseNotes
