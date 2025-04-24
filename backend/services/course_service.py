@@ -6,7 +6,10 @@ import os
 from typing import List
 from uuid import uuid4
 from fastapi import HTTPException, UploadFile, File
+from datetime import datetime
+
 import shutil
+from .auth_service import get_current_user
 
 
 
@@ -25,44 +28,33 @@ def add_course(course_data: CourseCreate, db: Session):
     return new_course
 
 
-def save_uploaded_files(course_notes: List) -> List[NotesData]:
+def save_uploaded_files(course_notes: List[UploadFile]) -> List[NotesData]:
     """
     Save list of UploadFile objects to disk and return metadata list.
     """
-    # saved = []
-    # for note in course_notes:
-    #     ext = note.filename.split('.')[-1]
-    #     filename = f"{course_code}_{uuid4().hex}.{ext}"
-    #     path = os.path.join(UPLOAD_DIR, filename)
-    #     with open(path, 'wb') as buffer:
-    #         buffer.write(note.file.read())
-    #     saved.append(NoteData(file_name=note.filename, file_path=path))
-    # return saved
         
     UPLOAD_DIR = "uploads/notes"
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     saved = []
     for note in course_notes:
         # Generate a unique filename
-        filename = f"{uuid.uuid4()}_{course_notes.filename}"
+        filename = f"{uuid.uuid4()}_{note.filename}"
         filepath = os.path.join(UPLOAD_DIR, filename)
         content_type = ''
+        
         #Save the file
         with open(filepath, "wb") as buffer:
             shutil.copyfileobj(note.file, buffer)
+        
+        # Get content type
+        content_type = note.content_type or 'application/octet-stream'
         saved.append(
             NotesData(
-                filename=filename,
-                saved_path=filepath,
+                file_name=filename,
+                file_path=filepath,
                 content_type=content_type
             ))
-        # return only serializable data
-        notesData = {
-            "filename": course_notes.filename,
-            "saved_path": course_notes.saved_path,
-            "content_type": course_notes.content_type
-        }
-        return {"notesData": notesData}
+    return saved
 
 def create_course_with_notes(course_data: CourseCreate, tutor_id: str, db: Session):
     """Creates a new course with notes"""
@@ -72,24 +64,25 @@ def create_course_with_notes(course_data: CourseCreate, tutor_id: str, db: Sessi
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid tutor ID format")
     
+    # Create the course
     new_course = Course(
         id=uuid4(),
         course_title = course_data.course_title,
         course_code = course_data.course_code,
-        course_notes = course_data.course_notes,
-        # course_tutor=course_data.course_tutor,
+        course_tutor=tutor_uuid,
+        created_at=datetime.utcnow(),
         tutor_id = tutor_uuid,
     )
     db.add(new_course)
     db.flush()  # Assigns ID to new_course before using it in CourseNote
     
-    # Add notes
+    # Add notes using the actual file data from NotesData
     for note in course_data.course_notes:
         course_note = CourseNotes(
             id=uuid4(),
             course_id=new_course.id,
-            file_name=note.filename,
-            file_path=note.saved_path,
+            file_name=note.file_name,
+            file_path=note.file_path,
             content_type=note.content_type
         )
         db.add(course_note)

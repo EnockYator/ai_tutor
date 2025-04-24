@@ -10,8 +10,8 @@ class CourseNotes(Base):
     __table_args__ = {"info": {"skip_autogenerate": True}}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    filename = Column(String)
-    saved_path = Column(String)
+    file_name = Column(String)
+    file_path = Column(String)
     content_type = Column(String)
     uploaded_at = Column(DateTime, default=datetime.utcnow)
     course_id = Column(UUID, ForeignKey('courses.id'))

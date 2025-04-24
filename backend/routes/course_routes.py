@@ -10,6 +10,7 @@ from services.course_service import (
     add_course, get_course_by_code, get_course_by_title, get_course_by_id, create_course_with_notes,
     save_uploaded_files
 )
+from services.auth_service import get_current_user
 from schemas.course_schema import CourseCreate, CourseResponse, EnrollmentResponse, EnrollmentSchema
 from models import Course, User
 from database import get_db, SessionLocal
@@ -21,14 +22,15 @@ def create_new_course(
     course_title: str = Form(...),
     course_code: str = Form(...),
     course_notes: List[UploadFile] = File(...),
+    current_user: dict = Depends(get_current_user), # Get the current logged-in user (tutor)
     # course_tutor: str = Form(...),
     # course_notes: List[UploadFile] = File(...),
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    # user: User = Depends(get_current_user)
 ):
     
     # Role guard
-    if user.role != "tutor":
+    if current_user.role != "tutor":
         raise HTTPException(status_code=403, detail="Only tutors can create courses")
 
     # Duplicate check
@@ -43,9 +45,11 @@ def create_new_course(
         course_title=course_title,
         course_code=course_code,
         course_notes=notes_meta,
-        # course_tutor=course_tutor
+        course_tutor=str(current_user.id)
+
     )
-    return create_course_with_notes(course_data, str(user.id), db)
+    # Create the course and assign the tutor's ID automatically
+    return create_course_with_notes(course_data, str(current_user.id), db)
 
 
 @router.post("/enroll", response_model=dict)

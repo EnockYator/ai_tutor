@@ -4,8 +4,8 @@ from typing import Optional, List
 from uuid import UUID
 
 class NoteResponse(BaseModel):
-    filename: str
-    saved_path: str
+    file_name: str
+    file_path: str
     content_type: str
 
     class Config:

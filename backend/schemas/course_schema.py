@@ -5,16 +5,21 @@ from uuid import UUID
 
 
 class NotesData(BaseModel):
-    id: UUID
-    filename: str
-    saved_path: str
+    # id: UUID
+    file_name: str
+    file_path: str
     content_type: str
+    
+    class Config:
+        from_attributes = True
+        orm_mode = True  # This allows Pydantic to work with ORM objects
+
     
 class CourseCreate(BaseModel):
     course_title: str
     course_code: str
     course_notes: List[NotesData] = []
-    # course_tutor: str
+    course_tutor: str
     # course_notes: Optional[str]  # Path or URL to uploaded file
     
     class Config:

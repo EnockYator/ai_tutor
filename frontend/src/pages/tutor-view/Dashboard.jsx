@@ -1,5 +1,4 @@
 // Dashboard.jsx
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -15,7 +14,7 @@ const Dashboard = () => {
     <div className="p-8 max-w-7xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Welcome back, Dr. Smith</h1>
-        <p className="text-gray-500">Here's your teaching overview</p>
+        <p className="text-gray-500">Here&#39;s your teaching overview</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -60,14 +59,14 @@ const Dashboard = () => {
           <div className="flex items-start">
             <div className="text-2xl mr-4">📝</div>
             <div className="flex-1">
-              <p className="text-gray-800">Created "Midterm Exam" for CS101</p>
+              <p className="text-gray-800">Created &quotMidterm Exam&quot for CS101</p>
               <span className="text-sm text-gray-400">2 hours ago</span>
             </div>
           </div>
           <div className="flex items-start">
             <div className="text-2xl mr-4">📚</div>
             <div className="flex-1">
-              <p className="text-gray-800">Uploaded "Advanced Algorithms" notes</p>
+              <p className="text-gray-800">Uploaded &quotAdvanced Algorithms&quot notes</p>
               <span className="text-sm text-gray-400">Yesterday</span>
             </div>
           </div>

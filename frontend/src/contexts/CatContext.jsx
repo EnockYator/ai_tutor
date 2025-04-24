@@ -12,11 +12,11 @@ const CatContext = createContext(null);
 export const CatProvider = ({ children }) => {
     const dispatch = useDispatch();
 
-    // Get category state from Redux
-    const catState = useSelector((state) => state.category);
+    // Get cat state from Redux
+    const catState = useSelector((state) => state.cat);
     
     // Extract specific values for convenience
-    const categories = catState.categories || [];
+    const cats = catState.cats || [];
     const isLoading = catState.isLoading;
     const error = catState.error;
     
@@ -29,12 +29,12 @@ export const CatProvider = ({ children }) => {
     };
 
     // Prevent premature loading
-    if (isLoading && !categories) {
-        return <div className="absolute top-4 left-3">Loading categories...</div>;
+    if (isLoading && !cats) {
+        return <div className="absolute top-4 left-3">Loading cats/assessments...</div>;
     }
 
     return (
-        <CatContext.Provider value={{ categories, isLoading, error, actions }}>
+        <CatContext.Provider value={{ cats, isLoading, error, actions }}>
             {children}
         </CatContext.Provider>
     );
