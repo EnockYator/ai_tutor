@@ -1,0 +1,82 @@
+services:
+  postgres:
+    image: postgres
+    container_name: elimu-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: Enock
+      POSTGRES_PASSWORD: Enock@postgresql02
+      POSTGRES_DB: Elimu_e-Learning_db
+    env_file:
+      - ./backend/.env
+    volumes:
+      ## Ensures data persists after container stops
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - myNetwork
+
+  backend:
+    container_name: elimu-backend
+    build: 
+      context: ./backend
+      args:
+        NODE_ENV: production  # Passes environment variable to Dockerfile
+    image: elimu-backend # Using the built image
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    env_file:
+      - ./backend/.env
+    networks:
+      - myNetwork
+    command: ["sh", "-c", "if [ \"$NODE_ENV\" = \"development\" ]; then exec npx nodemon server.js; else exec node server.js; fi"]
+
+  frontend:
+    container_name: elimu-frontend
+    build: ./frontend
+    image: elimu-frontend # Using the built image
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+    - "3000:80"  # Map port 80 from Nginx to port 3000
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend/.env
+    networks:
+      - myNetwork
+    # command: ["npm", "run", "dev"]  # No need to install dependencies at runtime
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: elimu-pgadmin
+    restart: always
+    environment:
+        PGADMIN_DEFAULT_EMAIL: ekyator02@gmail.com
+        PGADMIN_DEFAULT_PASSWORD: Admin@pgadmin02
+    ports:
+        - "5050:80"
+    depends_on:
+        - postgres
+    networks:
+      - myNetwork
+    volumes:
+        - pgadmin-data:/var/lib/pgadmin
+
+
+volumes:
+  pgdata:
+  pgadmin-data:
+networks:
+  myNetwork:
+    driver: bridge
+    

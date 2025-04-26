@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
-from models import Course, Enrollments, CourseNotes
-from schemas.course_schema import CourseCreate, CourseResponse, NotesData
+from models import Course, Enrollments, CourseNotes, User
+from schemas.course_schema import CourseCreate, CourseResponse, NotesData, EnrollmentSchema, EnrollmentResponse
 import uuid
 import os
-from typing import List
+from typing import List, Optional
+from uuid import UUID
 from uuid import uuid4
 from fastapi import HTTPException, UploadFile, File
 from datetime import datetime
@@ -92,23 +93,115 @@ def create_course_with_notes(course_data: CourseCreate, tutor_id: str, db: Sessi
     return new_course
 
 
-def enroll_student(course_id: str, student_id: str, db: Session):
+def enroll_student(enroll_data: EnrollmentSchema, db: Session):
     """Enroll a student in a course."""
-    existing = db.query(Enrollments).filter_by(course_id=course_id, student_id=student_id).first()
+    
+    try:
+        # Convert string to UUID if needed
+        course_uuid = uuid.UUID(enroll_data.course_id) if isinstance(enroll_data.course_id, str) else enroll_data.course_id
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid course ID format")
+    
+    try:
+        # Convert string to UUID if needed
+        student_uuid = uuid.UUID(enroll_data.student_id) if isinstance(enroll_data.student_id, str) else enroll_data.student_id
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid student ID format")
+    
+    # Check if course exists
+    course = db.query(Course).filter_by(id=course_uuid).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    
+    # Check if student exists
+    student = db.query(User).filter_by(id=student_uuid).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    # Check if already enrolled
+    existing = db.query(Enrollments).filter_by(course_id=course_uuid, student_id=student_uuid).first()
     if existing:
         raise HTTPException(status_code=400, detail="Already enrolled in this course")
-    enrollment = Enrollments(id=uuid4(), course_id=course_id, student_id=student_id)
-    db.add(enrollment)
+    
+    new_enrollment = Enrollments(
+        id=uuid4(),
+        course_id=course_uuid,
+        student_id=student_uuid,
+        enrolled_at=datetime.utcnow(),
+        enrolled=True
+    )
+    
+    db.add(new_enrollment)
     db.commit()
-    db.refresh(enrollment)
-    return enrollment
+    db.refresh(new_enrollment)
+    return new_enrollment
 
 
 def get_created_courses_by_tutor(tutor_id: str, db: Session):
-    return db.query(Course).filter(Course.tutor_id == tutor_id).all()
+    """
+    Retrieve all courses created by a specific tutor.
+    
+    Args:
+        tutor_id: UUID of the tutor
+        db: Database session
+    
+    Returns:
+        List of courses or raises HTTPException if tutor not found
+    """
+    
+    try:
+        # Convert string to UUID if needed
+        tutor_uuid = uuid.UUID(tutor_id) if isinstance(tutor_id, str) else tutor_id
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid tutor ID format")
+    
+    try:
+        # Verify tutor exists
+        # Check if student exists
+        tutor = db.query(User).filter_by(id=tutor_uuid).first()
+        if not tutor:
+            raise HTTPException(status_code=404, detail="Tutor not found")
+        
+        # Get courses created by this tutor
+        courses = db.query(Course).filter_by(tutor_id = tutor_uuid).all()
+        
+        
+        return {"courses": courses}
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid tutor ID format")
 
-def get_all_courses_by_users(db: Session):
-    return db.query(Course).filter(Course.course_id == id).all()
+def get_all_available_courses(db: Session, student_id: Optional[UUID] = None):
+    try:
+        courses = db.query(Course).join(User, Course.tutor_id == User.id).all()
+        
+        course_responses = []
+        for course in courses:
+            # Default not enrolled
+            enrolled = False
+            if student_id:
+                enrolled = db.query(Enrollments).filter_by(
+                    course_id=course.id,
+                    student_id=student_id
+                ).first() is not None
+            
+            course_response = CourseResponse(
+                id=course.id,
+                course_title=course.course_title,
+                course_code=course.course_code,
+                created_at=course.created_at,
+                course_tutor=course.course_tutor,
+                course_notes=course.course_notes,  
+            )
+            course_responses.append(course_response)
+        
+        return {"courses": course_responses}
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error retrieving courses: {str(e)}"
+        )
+
 
 def get_enrolled_courses(student_id: str, db: Session):
     return db.query(Course).join(Enrollments).filter(Enrollments.student_id == student_id).all()

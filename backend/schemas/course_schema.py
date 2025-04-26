@@ -24,48 +24,85 @@ class CourseCreate(BaseModel):
     
     class Config:
         from_attributes = True
+        
+class CourseNoteResponse(BaseModel):
+    id: UUID
+    file_name: str
+    file_path: str
+    content_type: str
+    uploaded_at: datetime
+    course_id: UUID   
+    
+    class Config:
+        from_attributes = True
 
 class CourseResponse(BaseModel):
     id: UUID
     course_title: str
     course_code: str
-    course_notes: List[str]  # Path or URL to uploaded file
+    course_notes: List[CourseNoteResponse]  
     course_tutor: str
     created_at: datetime
+    enrolled: bool = False  # Default to False, indicating the student is not enrolled
+    
+    class Config:
+        from_attributes = True
+        
+
+class CourseResponseList(BaseModel):
+    courses: List[CourseResponse]
+    
+    class Config:
+        from_attributes = True
+
+# class StudentCoursesResponse(BaseModel):
+#     tutor_name: str  # If you want to include tutor info
+#     enrollment_status: bool = False  # Whether student is enrolled    
+    
+class TutorCoursesList(BaseModel):
+    courses: List[CourseResponse]
+    
+    class Config:
+        from_attributes = True
+
+class StudentCourseResponse(BaseModel):
+    id: UUID
+    course_title: str
+    course_code: str
+    course_notes: List[CourseNoteResponse]  
+    course_tutor: str
+    created_at: datetime
+    enrolled: bool = True  # Default to False, indicating the student is not enrolled
+    # # tutor_name: str  # If you want to include tutor info
+    # enrollment_status: bool = False  # Whether student is enrolled
+    
+    class Config:
+        from_attributes = True
+
+    
+class StudentCoursesList(BaseModel):
+    courses: List[StudentCourseResponse]
     
     class Config:
         from_attributes = True
     
-    # @classmethod
-    # def from_orm(cls, course):
-    #     return cls(
-    #         id=UUID(course.id),
-    #         course_title=course.course_title,
-    #         course_code=course.course_code,
-    #         course_tutor=course.course_tutor,
-    #         course_notes=course.course_notes,
-    #         created_at=course.created_at.isoformat()  # Convert datetime to string
-    #     )
-    # @classmethod
-    # def from_orm(cls, user):
-    #     return cls(
-    #         id=UUID(user.id),
-    #         full_name=user.full_name
-    #     )
-
+    
 class EnrollmentSchema(BaseModel):
-    id: UUID
-    enrolled_at: datetime
+    # id: UUID
+    # enrolled_at: datetime
     course_id: UUID
     student_id: UUID
+    enrolled: bool = True  # Default to True, indicating the student is enrolled
 
     class Config:
         from_attributes = True
         
 class EnrollmentResponse(BaseModel):
+    id: UUID
     enrolled_at: datetime
     course_id: UUID
     student_id: UUID
+    enrolled: bool = True  # Default to True, indicating the student is enrolled
 
     class Config:
         from_attributes = True

@@ -17,8 +17,3 @@ class CourseNotes(Base):
     course_id = Column(UUID, ForeignKey('courses.id'))
 
     course = relationship("Course", back_populates="course_notes")
-    # enrollments = relationship("Enrollments", back_populates="course_notes")
-    # assessments = relationship("Assessment", back_populates="course_notes")
-    # ai_practice_quizzes = relationship("AiPracticeQuiz", back_populates="course_notes")
-    # student_answers = relationship("StudentAnswers", back_populates="course_notes")
-    # ai_feedback = relationship("AiFeedback", back_populates="course_notes")

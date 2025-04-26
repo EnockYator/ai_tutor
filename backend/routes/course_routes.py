@@ -2,16 +2,17 @@ from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status,
 from sqlalchemy.orm import Session
 import shutil, os
 from uuid import uuid4
+from uuid import UUID
 from typing import List
 from services.auth_service import get_current_user
-from models import User
+from models import User, Course
 from services.course_service import (
-    get_created_courses_by_tutor, get_all_courses_by_users, enroll_student, get_enrolled_courses,
+    get_created_courses_by_tutor, get_all_available_courses, enroll_student, get_enrolled_courses,
     add_course, get_course_by_code, get_course_by_title, get_course_by_id, create_course_with_notes,
     save_uploaded_files
 )
 from services.auth_service import get_current_user
-from schemas.course_schema import CourseCreate, CourseResponse, EnrollmentResponse, EnrollmentSchema
+from schemas.course_schema import CourseCreate, CourseResponse, EnrollmentResponse, EnrollmentSchema,TutorCoursesList, StudentCoursesList, StudentCourseResponse, CourseResponseList
 from models import Course, User
 from database import get_db, SessionLocal
 
@@ -52,30 +53,42 @@ def create_new_course(
     return create_course_with_notes(course_data, str(current_user.id), db)
 
 
-@router.post("/enroll", response_model=dict)
+@router.post("/enroll", response_model=EnrollmentResponse)
 def enroll_in_course(
     enroll_data: EnrollmentSchema,
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
-    if user.role != "student":
-        raise HTTPException(status_code=403, detail="Only students can enroll")
-
-    enrollment = enroll_student(str(enroll_data.course_id), str(user.id), db)
-    return {"message": "Enrolled successfully", "enrolled_at": enrollment.enrolled_at}
+    return enroll_student(enroll_data, db)
 
 
-@router.get("/tutor", response_model=List[CourseResponse])
+@router.get("/tutor/{tutor_id}", response_model=TutorCoursesList)
 def get_tutor_courses(
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    tutor_id: UUID,  # or str if you want to handle string conversion
+    db: Session = Depends(get_db)
 ):
-    if user.role != "tutor":
-        raise HTTPException(status_code=403, detail="Not a tutor")
-    return get_created_courses_by_tutor(str(user.id), db)
+    """
+    Get all courses created by a specific tutor.
+    
+    Parameters:
+    - tutor_id: UUID of the tutor
+    
+    Returns:
+    - List of courses created by the tutor
+    """
+    return get_created_courses_by_tutor(tutor_id, db)
 
+@router.get("/all", response_model=CourseResponseList)
+def get_all_courses(
+    student_id: UUID = None,  # Optional: to check enrollment status
+    db: Session = Depends(get_db)
+):
+    """
+    Get all available courses in the system.
+    Optionally takes student_id to check enrollment status.
+    """
+    return get_all_available_courses(db, student_id)
 
-@router.get("/student", response_model=List[CourseResponse])
+@router.get("/student", response_model=List[StudentCourseResponse])
 def get_student_courses(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
