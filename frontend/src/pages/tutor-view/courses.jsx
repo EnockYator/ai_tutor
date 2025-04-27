@@ -46,7 +46,6 @@ const CourseItem = memo(({ data, index, style }) => {
 
 CourseItem.displayName = "CourseItem";
 
-
 const Courses = () => {
   const { courses, isLoading, error, actions } = useCourse();
   const { toast } = useToast();
