@@ -2,8 +2,11 @@
 
 from .user_model import User
 from .course_model import Course
-from .assessment_model import Assessment
+from .cat_model import Cat
+from .cat_attempt_models import CatAttempt
 from .question_model import Question
+from .cat_question_model import CatQuestion
+from .cat_answer_model import CatAnswer
 from .student_answer_model import StudentAnswer
 from .ai_feedback_model import AIFeedback
 from .ai_practice_quiz_models import AIPracticeQuiz

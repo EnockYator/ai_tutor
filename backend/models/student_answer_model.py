@@ -14,3 +14,5 @@ class StudentAnswer(Base):
     selected_answer = Column(String)
     is_correct = Column(Boolean)
     submitted_at = Column(DateTime, default=datetime.utcnow)
+    
+    

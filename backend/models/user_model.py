@@ -19,6 +19,7 @@ class User(Base):
     
     courses = relationship("Course", back_populates="students")
     enrollments = relationship("Enrollments", back_populates="students")
+    cat_attempts = relationship("CatAttempt", back_populates="student")
 
     # courses = relationship("Course", back_populates="tutors")
     # enrollments = relationship("Enrollments", back_populates="students")

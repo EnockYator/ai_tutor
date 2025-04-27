@@ -190,7 +190,8 @@ def get_all_available_courses(db: Session, student_id: Optional[UUID] = None):
                 course_code=course.course_code,
                 created_at=course.created_at,
                 course_tutor=course.course_tutor,
-                course_notes=course.course_notes,  
+                course_notes=course.course_notes, 
+                enrolled=enrolled 
             )
             course_responses.append(course_response)
         

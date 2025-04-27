@@ -16,7 +16,7 @@ class Course(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     tutor_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     
-    
+    cats = relationship("Cat", back_populates="course")
     course_notes = relationship("CourseNotes", back_populates="course")
     students = relationship("User", back_populates="courses")
     enrollments = relationship("Enrollments", back_populates="course")
