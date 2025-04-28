@@ -1,71 +1,93 @@
+/* eslint-disable react/display-name */
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useCallback, lazy, Suspense, memo } from 'react';
 import { useCourse } from '@/contexts/CourseContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { FixedSizeList as List } from 'react-window';
 
-// Lazy load the modal component
+// Lazy load the modal
 const CreateCourseModal = lazy(() => import('./CreateCourseModal'));
 
-const CourseItem = memo(({ data, index, style }) => {
-  const course = data[index];
+const CourseItem = memo(({ course }) => {
+  const formattedDate = new Date(course.created_at).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  const { user } = useAuth();
+  
   return (
-    <div style={style}>
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
-        <div className="p-6 h-full">
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-xl font-semibold text-gray-700">{course.code}</h3>
-            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-              {course.enrolledStudents?.length || 0} students
-            </span>
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100">
+      {/* Course Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 flex justify-between items-start p-4 border-b text-white">
+        <div>
+          <h2 className="font-bold text-lg">{course.course_title}</h2>
+          <p className="text-blue-100">{course.course_code}</p>
+        </div>
+      </div>
+
+      {/* Course Body */}
+      <div className="p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-blue-100 p-2 rounded-full">
+            <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">{course.title}</h2>
-          <div className="flex gap-6 mb-6">
-            <div>
-              <span className="block text-2xl font-bold text-gray-700">{course.materials?.length || 0}</span>
-              <span className="text-gray-500">Materials</span>
-            </div>
-            <div>
-              <span className="block text-2xl font-bold text-gray-700">{course.assessments?.length || 0}</span>
-              <span className="text-gray-500">CATs</span>
-            </div>
+          <div>
+            <p className="text-sm text-gray-500">Username</p>
+            <p className="font-medium">{user.full_name}</p>
           </div>
-          <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-            <span className="text-sm text-gray-400">
-              Last updated: {new Date(course.updatedAt).toLocaleDateString()}
-            </span>
-            <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-              Manage
-            </button>
+        </div>
+
+      {/* Notes Summary */}
+      <div className='mb-4 flex flex-col  pl-5'>
+        <h4 className="text-sm font-semibold text-gray-700 mb-2">Course Summary</h4>
+        <div className='flex flex-row gap-8'>
+          <div className='flex flex-col'>
+            <p className="text-sm text-gray-500">Notes</p>
+            <p className="bg-gray-50 py-1 rounded-full text-sm">{course.course_notes.length || 0} {course.course_notes.length === 1 ? 'Copy' : 'Copies'}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Cats</p>
+            <p className="bg-gray-50 py-1 rounded-full text-sm">{course.course_file ? course.course_file.name : 'No CAT Created'}</p>
           </div>
         </div>
       </div>
+      
+
+      {/* Footer with Action Buttons */}
+      <div className="flex justify-between items-center p-4 border-t">
+        <span className='text-sm text-gray-500'>Created On: {formattedDate}</span>
+      </div>
     </div>
+  </div>
   );
 });
 
-CourseItem.displayName = "CourseItem";
+
 
 const Courses = () => {
-  const { courses, isLoading, error, actions } = useCourse();
+  const { courses, isLoading, error, actions, setError } = useCourse();
   const { toast } = useToast();
+  const { user } = useAuth();
+
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newCourse, setNewCourse] = useState({
-    title: '',
-    code: '',
-    courseFile: null
-  });
+  const [newCourse, setNewCourse] = useState({ title: '', code: '', courseFile: null });
   const [fileError, setFileError] = useState('');
 
-  const itemSize = 320;
+  const tutorId = user?.id;
+  console.log("tutorId: ", tutorId);
 
   const fetchCourses = useCallback(() => {
-    actions.getTutorCourses();
-  }, [actions]);
+    if (tutorId) {
+      actions.getTutorCourses(tutorId);
+    }
+  }, [actions, tutorId]);
 
   useEffect(() => {
     fetchCourses();
-  }, [fetchCourses]);
+  }, []);
 
   useEffect(() => {
     if (error) {
@@ -76,7 +98,7 @@ const Courses = () => {
           className: "bg-toastError text-white max-w-md h-16 z-50",
           duration: 3000,
         });
-      }, 100);
+      }, 200);
       return () => clearTimeout(timer);
     }
   }, [error, toast]);
@@ -103,12 +125,8 @@ const Courses = () => {
   }, []);
 
   const validateCourse = useCallback((course) => {
-    if (!course.title || !course.code) {
-      return "Title and code are required!";
-    }
-    if (!course.courseFile) {
-      return "Please upload course notes";
-    }
+    if (!course.title || !course.code) return "Title and code are required!";
+    if (!course.courseFile) return "Please upload course notes";
     return null;
   }, []);
 
@@ -118,28 +136,32 @@ const Courses = () => {
       setFileError(validationError);
       return;
     }
-  
+
     try {
       const formData = new FormData();
       formData.append('title', newCourse.title);
       formData.append('code', newCourse.code);
       formData.append('file', newCourse.courseFile);
-  
-      // Clear the file from memory immediately after creating FormData
-      setNewCourse(prev => ({ ...prev, courseFile: null }));
-  
+
       await actions.createCourse(formData);
-      
-      toast({
-        title: "Success",
-        description: "Course created successfully",
-        className: "bg-toastSuccess text-white max-w-md h-16 z-50",
-        duration: 3000,
-      });
-  
+
+      if (response.status === 201) {
+        // If course is created successfully, show toast
+        toast({
+          title: "Success",
+          description: "Course created successfully",
+          className: "bg-toastSuccess text-white max-w-md h-16 z-50",
+          duration: 3000,
+        });
+
+      // Reset form and close modal
       setShowCreateModal(false);
       setNewCourse({ title: '', code: '', courseFile: null });
-      setFileError('');
+      setError('');
+      fetchCourses(); // Refresh the course list
+      }
+
+      
     } catch (error) {
       toast({
         title: "Error",
@@ -147,12 +169,10 @@ const Courses = () => {
         className: "bg-toastError text-white max-w-md h-16 z-50",
         duration: 3000,
       });
-    } finally {
-      // Ensure loading state is always reset
     }
-  }, [newCourse, actions, toast, validateCourse]);
+  }, [newCourse, actions, toast, validateCourse, fetchCourses]);
 
-  if (isLoading && !courses) {
+  if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading courses...</div>;
   }
 
@@ -172,16 +192,15 @@ const Courses = () => {
           </button>
         </div>
 
-        <div className="course-list-container">
-          <List
-            height={600}
-            itemCount={courses.length}
-            itemSize={itemSize}
-            width={'100%'}
-            itemData={courses}
-          >
-            {(props) => <CourseItem {...props} />}
-          </List>
+        {/* Render courses */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xlg:grid-cols-3 gap-8">
+          {courses && courses.length > 0 ? (
+            courses.map((course) => (
+              <CourseItem key={course.id} course={course} />
+            ))
+          ) : (
+            <div className="col-span-full text-center text-gray-500">No courses found.</div>
+          )}
         </div>
       </div>
 

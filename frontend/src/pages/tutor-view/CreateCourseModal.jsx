@@ -2,11 +2,11 @@
 
 const CreateCourseModal = ({
     newCourse,
-    fileError,
+    error,
     isLoading,
     setNewCourse,
     setShowCreateModal,
-    setFileError,
+    setError,
     handleFileChange,
     handleCreateCourse
     }) => {
@@ -20,7 +20,7 @@ const CreateCourseModal = ({
 
     const handleCancel = () => {
         setShowCreateModal(false);
-        setFileError('');
+        setError('');
     };
 
     return (
@@ -57,7 +57,7 @@ const CreateCourseModal = ({
                 onChange={handleFileChange}
                 accept=".pdf,.doc,.docx"
                 />
-                {fileError && <p className="mt-1 text-sm text-red-600">{fileError}</p>}
+                {error && <p className="mt-1 text-sm text-red-600">{error.message}</p>}
             </div>
             </div>
             

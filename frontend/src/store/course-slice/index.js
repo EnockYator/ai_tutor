@@ -2,12 +2,14 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../../axios";
 
 const initialState = {
+    newCourse: { title: '', code: '', file: null },
     courses: [],
     enrolledCourses: [],
     course: null,
     isLoading: false,
     error: null,
 };
+
 
 // Create new course (tutor only)
 export const createCourse = createAsyncThunk(
@@ -36,7 +38,7 @@ export const enrollCourse = createAsyncThunk(
     'course/enroll',
     async (courseId, thunkAPI) => {
         try {
-            const response = await axiosInstance.post(`/courses/enroll`, { course_id: courseId });
+            const response = await axiosInstance.post('/courses/enroll', { course_id: courseId });
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to enroll in course");
@@ -60,9 +62,9 @@ export const getTutorCourses = createAsyncThunk(
 // Get all available courses
 export const getAllCourses = createAsyncThunk(
     'course/allCourses',
-    async (_, thunkAPI) => {
+    async (studentId, thunkAPI) => {
         try {
-            const response = await axiosInstance.get('/courses/all');
+            const response = await axiosInstance.get('/courses/all', {student_id: studentId});
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch courses");
@@ -127,6 +129,12 @@ const courseSlice = createSlice({
     initialState,
     reducers: {
         resetCourseState: () => initialState,
+        setNewCourse: (state, action) => {
+            state.newCourse = { ...state.newCourse, ...action.payload };
+        },
+        setError: (state, action) => {
+            state.error = action.payload;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -165,7 +173,13 @@ const courseSlice = createSlice({
             })
             .addCase(getTutorCourses.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.courses = action.payload.courses;
+                // backend returns { courses: [...] }
+                if (action.payload.courses) {
+                    state.courses = action.payload.courses;
+                } else if (Array.isArray(action.payload)) {
+                    // fallback if it’s just an array
+                    state.courses = action.payload;
+                }
             })
             .addCase(getTutorCourses.rejected, (state, action) => {
                 state.isLoading = false;
@@ -244,5 +258,5 @@ const courseSlice = createSlice({
     }
 });
 
-export const { resetCourseState } = courseSlice.actions;
+export const { resetCourseState, setNewCourse, setError } = courseSlice.actions;
 export default courseSlice.reducer;

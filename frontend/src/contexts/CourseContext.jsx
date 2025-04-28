@@ -8,8 +8,24 @@ const CourseContext = createContext(null);
 
 export const CourseProvider = ({ children }) => {
     const dispatch = useDispatch();
+
+    // Get course state from Redux
     const courseState = useSelector((state) => state.course);
-    const { courses, enrolledCourses, course, isLoading, error } = courseState;
+    
+
+    // Extract specific values for convenience    
+    const courses = courseState.courses  || null;
+    const enrolledCourses = courseState.enrolledCourses || null;
+    const course = courseState.course ;
+    const isLoading = courseState.isLoading;
+    const error = courseState.error;
+    const newCourse = courseState.newCourse;
+
+    // console.log("courseState: ", courseState)
+    // console.log("courseState.courses: ", courseState.courses)
+    // console.log("courseState.enrolledCourses: ", courseState.enrolledCourses)
+    // console.log("courseState.course: ", courseState.course)
+    // console.log("courseState.isLoading: ", courseState.isLoading)
 
     const actions = {
         createCourse: (courseData) => dispatch(createCourse(courseData)),
@@ -22,8 +38,10 @@ export const CourseProvider = ({ children }) => {
         fetchCourseByCode: (code) => dispatch(fetchCourseByCode(code)),
     };
 
+    
+
     return (
-        <CourseContext.Provider value={{ courses, enrolledCourses, course, isLoading, error, actions }}>
+        <CourseContext.Provider value={{ courses, enrolledCourses, course, isLoading, error, actions, newCourse }}>
             {children}
         </CourseContext.Provider>
     );
