@@ -90,7 +90,7 @@ def create_course_with_notes(course_data: CourseCreate, tutor_id: str, db: Sessi
     
     db.commit()
     db.refresh(new_course)
-    return new_course
+    return new_course, 201
 
 
 def enroll_student(enroll_data: EnrollmentSchema, db: Session):
@@ -164,9 +164,8 @@ def get_created_courses_by_tutor(tutor_id: str, db: Session):
         
         # Get courses created by this tutor
         courses = db.query(Course).filter_by(tutor_id = tutor_uuid).all()
-        
-        
-        return {"courses": courses}
+        total = db.query(Course).filter(Course.course_tutor == str(tutor_id)).count()
+        return {"courses": courses, "total": total}
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid tutor ID format")
 
@@ -205,7 +204,9 @@ def get_all_available_courses(db: Session, student_id: Optional[UUID] = None):
 
 
 def get_enrolled_courses(student_id: str, db: Session):
-    return db.query(Course).join(Enrollments).filter(Enrollments.student_id == student_id).all()
+    courses = db.query(Course).join(Enrollments).filter(Enrollments.student_id == student_id).all()
+    total = db.query(Course).join(Enrollments).filter(Enrollments.student_id == student_id).count()
+    return {"courses": courses, "total": total}
 
 def get_course_by_title(db: Session, course_title: str):
     """Fetch course by title."""

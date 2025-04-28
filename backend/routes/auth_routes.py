@@ -43,6 +43,11 @@ def register(user_data: RegisterSchema, db: Session = Depends(get_db)):
     return register_user(user_data, db)
 
 
+@router.get("/me", response_model=UserResponse)
+def get_current_user_info(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
 @router.post("/login/", response_model=TokenData)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
@@ -60,13 +65,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
         "user": UserLoginResponse(
             email=user.email,
             role=user.role,
-            full_name=user.full_name
+            full_name=user.full_name,
+            id=user.id
         )
         }
 
 @router.post("/logout")
 async def logout():
     # FastAPI doesn't handle sessions by default, so logout is client-side
-    return {"message": "Successfully logged out"}
+    return {"message": "Logout Successful"}
 
 

@@ -26,6 +26,7 @@ class UserLoginResponse(BaseModel):
     email: EmailStr
     role: str
     full_name: str
+    id: UUID
     
     class Config:
         from_attributes = True
